@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f8fa;
+  --foreground: #171717;
+  --card: #ffffff;
+  --accent: #2563eb;
+  --accent-hover: #1e40af;
+  --input-bg: #f1f5f9;
+  --input-border: #d1d5db;
+  --error: #e11d48;
+  --success: #22c55e;
+}
+
+:root[data-theme="inline"] {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #090b11;
+    --foreground: #ededed;
+    --card: #171c23;
+    --input-bg: #23283d;
+    --input-border: #39436b;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Center cards for forms */
+.card-container {
+  background: var(--card);
+  color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  max-width: 400px;
+  margin: 6rem auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Form fields */
+input, textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  color: var(--foreground);
+  outline: none;
+  transition: border 0.2s;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent);
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover:enabled {
+  background: var(--accent-hover);
+}
+
+label {
+  font-size: 0.95rem;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+.error-message {
+  color: var(--error);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+.success-message {
+  color: var(--success);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
