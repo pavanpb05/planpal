@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { auth } from "../../src/firebaseAuth";
 import { confirmPasswordReset } from "firebase/auth";
@@ -7,11 +7,12 @@ import { confirmPasswordReset } from "firebase/auth";
 export default function ResetPassword() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [oobCode, setOobCode] = useState("");
+  const initialOobCode = searchParams.get("oobCode") || "";
+  const [oobCode] = useState(initialOobCode);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialOobCode ? "" : "Invalid or missing password reset code.");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

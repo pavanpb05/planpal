@@ -6,7 +6,6 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
-// import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 export default function Page() {
   const [email, setEmail] = useState("");
