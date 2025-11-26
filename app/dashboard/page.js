@@ -138,7 +138,7 @@ export default function DashboardPage() {
         className="flex-1 flex flex-col"
         style={{ marginLeft: "var(--sidebar-width, 256px)" }}
       >
-        <Topbar  />
+        <Topbar  user={uiUser}/>
 
         <main className="p-6">
           <section className="mb-6">

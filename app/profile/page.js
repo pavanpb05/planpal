@@ -217,7 +217,7 @@ const uiUser = user
         className="flex-1 flex flex-col"
         style={{ marginLeft: "var(--sidebar-width, 256px)" }}
       >
-        <Topbar />
+        <Topbar user={uiUser}/>
 
         <main className="px-4 py-8 lg:px-12 lg:py-10">
           <div className="max-w-7xl mx-auto rounded-3xl bg-slate-900/60 border border-slate-800/80 shadow-[0_18px_60px_rgba(15,23,42,0.9)] backdrop-blur-xl px-6 py-6 lg:px-10 lg:py-10 space-y-8">
@@ -332,7 +332,7 @@ const uiUser = user
 
             {/* Avatar upload */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="relative h-16 w-16 rounded-full bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 p-[2px]">
+              <div className="relative h-16 w-16 rounded-full bg-linear-to-r from-indigo-500 via-sky-400 to-emerald-400 p-0.5">
                 <div className="h-full w-full rounded-full bg-slate-950 flex items-center justify-center overflow-hidden">
                   {avatarPreview ? (
                     // eslint-disable-next-line @next/next/no-img-element
