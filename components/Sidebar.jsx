@@ -11,22 +11,43 @@ const navItems = [
   { href: "/profile", label: "Profile", icon: User },
 ];
 
+const SIDEBAR_WIDTH_EXPANDED = "256px";
+const SIDEBAR_WIDTH_COLLAPSED = "72px";
+
 export default function Sidebar({ handleLogout }) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(() => {
-    const saved =
-      typeof window !== "undefined" &&
-      localStorage.getItem("sidebar-collapsed");
-    return saved !== null ? saved === "true" : false;
-  });
+  // ✅ deterministic initial value (same on server + first client render)
+  const [collapsed, setCollapsed] = useState(false);
 
+  // After mount, read from localStorage once
   useEffect(() => {
-    localStorage.setItem("sidebar-collapsed", collapsed ? "true" : "false");
+    if (typeof window === "undefined") return;
+
+    const saved = window.localStorage.getItem("sidebar-collapsed");
+    const isCollapsed = saved === "true";
+
+    setCollapsed(isCollapsed);
     document.documentElement.style.setProperty(
       "--sidebar-width",
-      collapsed ? "72px" : "256px"
+      isCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED
     );
-  }, [collapsed]);
+  }, []);
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("sidebar-collapsed", next ? "true" : "false");
+        document.documentElement.style.setProperty(
+          "--sidebar-width",
+          next ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED
+        );
+      }
+
+      return next;
+    });
+  };
 
   return (
     <aside
@@ -34,7 +55,8 @@ export default function Sidebar({ handleLogout }) {
       bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900
       shadow-[0_18px_70px_rgba(15,23,42,0.95)]
       border-r border-slate-800/80 transition-all duration-300`}
-      style={{ width: collapsed ? 72 : 256 }}
+      // ✅ width is always a string, not a raw number
+      style={{ width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED }}
     >
       <div className="flex h-full flex-col px-3 py-5">
         <div className="flex items-center justify-between mb-6 px-2">
@@ -47,7 +69,6 @@ export default function Sidebar({ handleLogout }) {
                   : "bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400"
               }`}
             />
-
             {!collapsed && (
               <span className="text-sm font-semibold tracking-[0.25em] text-slate-100 uppercase">
                 PlanPal
@@ -58,7 +79,7 @@ export default function Sidebar({ handleLogout }) {
           {/* COLLAPSE BUTTON */}
           <button
             aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
-            onClick={() => setCollapsed((s) => !s)}
+            onClick={toggleCollapsed}
             className="p-1 rounded-md hover:bg-slate-900/50 transition"
             title={collapsed ? "Open" : "Collapse"}
           >
