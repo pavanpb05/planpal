@@ -10,8 +10,9 @@ import {
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "@/src/firebaseConfig";
-import { uploadImageToCloudinary } from "@/src/lib/uploadImage";
+// Use your canonical firebase export path — commonly "@/firebase"
+import { db } from "@/firebase";
+import { uploadImageToCloudinary } from "@/lib/uploadImage";
 import { ImagePlus, Loader2 } from "lucide-react";
 
 /**
@@ -40,6 +41,9 @@ export default function TripPhotosSection({ tripId, user, readOnly = false }) {
         ...doc.data(),
       }));
       setPhotos(list);
+    }, (err) => {
+      console.error("Trip photos snapshot error:", err);
+      setError("Failed to load trip photos.");
     });
 
     return () => unsub();
@@ -54,11 +58,8 @@ export default function TripPhotosSection({ tripId, user, readOnly = false }) {
 
     try {
       for (const file of files) {
-        // 1) Upload to Cloudinary
-        const url = await uploadImageToCloudinary(
-          file,
-          `planpal/trips/${tripId}`
-        );
+        // 1) Upload to Cloudinary via your server API
+        const url = await uploadImageToCloudinary(file, `planpal/trips/${tripId}`);
 
         // 2) Save metadata in Firestore
         await addDoc(collection(db, "trips", tripId, "photos"), {
@@ -70,11 +71,15 @@ export default function TripPhotosSection({ tripId, user, readOnly = false }) {
         });
       }
     } catch (err) {
-      console.error(err);
-      setError("Failed to upload one or more photos.");
+      console.error("Trip photo upload error:", err);
+      // surface more helpful message if available
+      setError(err?.message || "Failed to upload one or more photos.");
     } finally {
       setUploading(false);
-      e.target.value = ""; // reset input so same files can be reselected
+      // reset input
+      try {
+        e.target.value = "";
+      } catch {}
     }
   };
 

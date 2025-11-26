@@ -171,7 +171,7 @@ export default function Page() {
             type="button"
             onClick={handlePasswordReset}
             disabled={loading}
-            className="text-indigo-300 hover:text-emerald-200"
+            className="text-indigo-300 hover:text-emerald-200 w-30 h-7"
           >
             Forgot password?
           </button>

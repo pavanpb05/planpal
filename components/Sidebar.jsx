@@ -169,7 +169,7 @@ export default function Sidebar({ handleLogout }) {
               onClick={handleLogout}
               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2.5 text-xs font-semibold text-slate-50 transition-all duration-200 hover:bg-red-600/10"
             >
-              <Power className="h-4 w-4 text-red-400" />
+              <Power className="h-4 w-4 text-white "/>
               <span>Log out</span>
             </button>
           )}

@@ -4,13 +4,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/Topbar";
+import Topbar from "@/components/Topbar.jsx";
 import Card from "@/components/Card";
+
+// Firestore for profile
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../src/firebaseConfig";
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const router = useRouter();
 
+  // 🔹 Auth listener (same as before)
   useEffect(() => {
     let unsub = null;
     let mounted = true;
@@ -44,6 +50,25 @@ export default function DashboardPage() {
       if (typeof unsub === "function") unsub();
     };
   }, [router]);
+
+  // 🔹 Load profile from Firestore once we know the user
+  useEffect(() => {
+    if (!user) return;
+
+    async function loadProfile() {
+      try {
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          setProfile(snap.data());
+        }
+      } catch (err) {
+        console.error("Failed to load dashboard profile:", err);
+      }
+    }
+
+    loadProfile();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -88,16 +113,22 @@ export default function DashboardPage() {
     },
   ];
 
-  // 👇 single source of truth for user name
-const name =
-  user?.displayName || user?.email?.split("@")[0] || "User";
+  // 🔹 Same logic as profile page: choose best name/email
+  const effectiveEmail = profile?.email || user?.email || "";
+  const effectiveName =
+    profile?.name ||
+    user?.displayName ||
+    (effectiveEmail ? effectiveEmail.split("@")[0] : "User");
 
-const uiUser = user
-  ? {
-      ...user,
-      displayName: name,
-    }
-  : null;
+  // 🔹 uiUser is what Topbar sees (name + email consistent with profile)
+  const uiUser = user
+    ? {
+        ...user,
+        displayName: effectiveName,
+        email: effectiveEmail,
+        photoURL: profile?.avatarUrl || user?.photoURL || "",
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-neutral-900 text-slate-100 flex">
@@ -107,12 +138,12 @@ const uiUser = user
         className="flex-1 flex flex-col"
         style={{ marginLeft: "var(--sidebar-width, 256px)" }}
       >
-        <Topbar user={uiUser} />
+        <Topbar  />
 
         <main className="p-6">
           <section className="mb-6">
             <h2 className="text-3xl font-semibold">
-              Welcome back {uiUser}!
+              Welcome back {effectiveName}!
             </h2>
             <p className="text-lg text-slate-400 mt-2 max-w-2xl">
               Plan and manage group trips, vote on options, split expenses & view smart suggestions.

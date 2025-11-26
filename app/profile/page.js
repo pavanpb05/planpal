@@ -202,9 +202,9 @@ const effectiveAvatar =
 const uiUser = user
   ? {
       ...user,
-      displayName: effectiveName,  // 👈 Topbar will use this
-      email: effectiveEmail,       // 👈 Topbar shows this
-      photoURL: effectiveAvatar,   // 👈 Topbar avatar
+      displayName: effectiveName,
+      email: effectiveEmail,
+      photoURL: effectiveAvatar,
     }
   : null;
 
@@ -217,7 +217,7 @@ const uiUser = user
         className="flex-1 flex flex-col"
         style={{ marginLeft: "var(--sidebar-width, 256px)" }}
       >
-        <Topbar user={uiUser} />
+        <Topbar />
 
         <main className="px-4 py-8 lg:px-12 lg:py-10">
           <div className="max-w-7xl mx-auto rounded-3xl bg-slate-900/60 border border-slate-800/80 shadow-[0_18px_60px_rgba(15,23,42,0.9)] backdrop-blur-xl px-6 py-6 lg:px-10 lg:py-10 space-y-8">

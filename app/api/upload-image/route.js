@@ -25,7 +25,7 @@ export async function POST(req) {
     const result = await cloudinary.uploader.upload(image, {
       folder,
       transformation: [
-        { width: 1600, height: 1600, crop: "limit" }, // keep big but reasonable
+        { width: 1600, height: 1600, crop: "limit" },
         { quality: "auto", fetch_format: "auto" },
       ],
     });
@@ -33,8 +33,10 @@ export async function POST(req) {
     return NextResponse.json({ url: result.secure_url });
   } catch (err) {
     console.error("Cloudinary upload error:", err);
+    // include the Cloudinary error message in the response body for easier debugging
+    const message = err?.message || "Upload failed";
     return NextResponse.json(
-      { error: "Upload failed" },
+      { error: message, details: err },
       { status: 500 }
     );
   }

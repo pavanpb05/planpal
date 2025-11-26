@@ -1,9 +1,12 @@
 // components/Topbar.jsx
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/src/firebaseConfig";
 
 function getInitial(nameOrEmail) {
   if (!nameOrEmail) return "U";
@@ -11,12 +14,69 @@ function getInitial(nameOrEmail) {
   return base[0]?.toUpperCase() || "U";
 }
 
-export default function Topbar({ user }) {
-  const displayName =
-    user?.displayName || user?.email?.split("@")[0] || "User";
+export default function Topbar() {
+  const [authUser, setAuthUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
-  const avatarUrl = user?.photoURL || "";
-  const initial = getInitial(displayName || user?.email);
+  // 🔹 Listen to auth & load profile INSIDE Topbar
+  useEffect(() => {
+    let unsub = null;
+    let mounted = true;
+
+    async function init() {
+      try {
+        const firebaseModule = await import("@/firebase");
+        const { auth } = firebaseModule;
+        const { onAuthStateChanged } = await import("firebase/auth");
+
+        if (!auth || !onAuthStateChanged) {
+          console.warn("Topbar: auth not ready");
+          return;
+        }
+
+        unsub = onAuthStateChanged(auth, async (u) => {
+          if (!mounted) return;
+
+          setAuthUser(u);
+
+          if (!u) {
+            setProfile(null);
+            return;
+          }
+
+          try {
+            const ref = doc(db, "users", u.uid);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+              setProfile(snap.data());
+            } else {
+              setProfile(null);
+            }
+          } catch (err) {
+            console.error("Topbar: failed to load profile", err);
+          }
+        });
+      } catch (err) {
+        console.error("Topbar: init error", err);
+      }
+    }
+
+    init();
+
+    return () => {
+      mounted = false;
+      if (typeof unsub === "function") unsub();
+    };
+  }, []);
+
+  const email = profile?.email || authUser?.email || "";
+  const displayName =
+    profile?.name ||
+    authUser?.displayName ||
+    (email ? email.split("@")[0] : "User");
+
+  const avatarUrl = profile?.avatarUrl || authUser?.photoURL || "";
+  const initial = getInitial(displayName || email);
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3 lg:px-8">
@@ -42,13 +102,8 @@ export default function Topbar({ user }) {
         </div>
       </div>
 
-      {/* RIGHT: bell + user chip */}
+      {/* RIGHT: user chip → /profile */}
       <div className="flex items-center gap-4">
-        {/* <button className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-slate-900 hover:bg-slate-800 transition">
-          <Bell className="h-4 w-4 text-slate-200" />
-        </button> */}
-
-        {/* User chip → /profile */}
         <Link
           href="/profile"
           className="flex items-center gap-2 rounded-full border border-transparent px-2 py-1 hover:border-slate-700 hover:bg-slate-900/80 transition"
@@ -58,7 +113,7 @@ export default function Topbar({ user }) {
               {displayName}
             </span>
             <span className="text-[11px] text-slate-400">
-              {user?.email || ""}
+              {email}
             </span>
           </div>
 
