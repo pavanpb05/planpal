@@ -62,7 +62,7 @@ export default function Sidebar({ handleLogout }) {
     <aside
       aria-label="Primary navigation"
       className="fixed inset-y-0 left-0 z-30 flex flex-col
-        bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900
+        bg-linear-to-b from-slate-950 via-slate-950 to-slate-900
         shadow-[0_18px_70px_rgba(15,23,42,0.95)]
         border-r border-slate-800/80 transition-all duration-300"
       style={{
@@ -77,7 +77,7 @@ export default function Sidebar({ handleLogout }) {
               ${
                 collapsed
                   ? "bg-indigo-500"
-                  : "bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400"
+                  : "bg-linear-to-r from-indigo-500 via-sky-400 to-emerald-400"
               }`}
           >
             <span className="text-sm font-bold text-slate-900 select-none">
@@ -142,7 +142,7 @@ export default function Sidebar({ handleLogout }) {
                   className={`group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-200
                     ${
                       active
-                        ? "bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 text-slate-900 shadow-sm"
+                        ? "bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-400 text-slate-900 shadow-sm"
                         : "text-slate-50 hover:bg-slate-900/70"
                     }`}
                 >

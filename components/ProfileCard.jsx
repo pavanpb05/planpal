@@ -43,7 +43,7 @@ export default function ProfileCard({ user, profile, onEdit }) {
             priority
           />
         ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 text-lg font-semibold text-slate-950 ring-2 ring-indigo-300 shadow-xl shadow-indigo-900/70">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-r from-indigo-500 via-sky-400 to-emerald-400 text-lg font-semibold text-slate-950 ring-2 ring-indigo-300 shadow-xl shadow-indigo-900/70">
             {initials}
           </div>
         )}
