@@ -191,17 +191,22 @@ export default function ProfilePage() {
   }
 };
 
-const effectiveAvatar =
-  (profile && profile.avatarUrl) ||
-  (user && user.photoURL) ||
-  "";
+const effectiveEmail = profile?.email || user?.email || "";
+const effectiveName =
+  profile?.name || user?.displayName || effectiveEmail.split("@")[0] || "User";
 
-  const uiUser = user
-    ? {
-        ...user,
-        photoURL: effectiveAvatar,
-      }
-    : null;
+const effectiveAvatar =
+  profile?.avatarUrl || user?.photoURL || "";
+
+// This is what we pass to Topbar + ProfileCard
+const uiUser = user
+  ? {
+      ...user,
+      displayName: effectiveName,  // 👈 Topbar will use this
+      email: effectiveEmail,       // 👈 Topbar shows this
+      photoURL: effectiveAvatar,   // 👈 Topbar avatar
+    }
+  : null;
 
 
   return (

@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/src/firebaseAuth";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
-import TripPhotosSection from "@/components/TripPhotosSection";
+import TripPhotoSection from "@/components/TripPhotoSection";
 
 export default function TripPage() {
   const params = useParams();
@@ -58,7 +58,7 @@ export default function TripPage() {
 
             {/* Photos */}
             <section className="rounded-3xl bg-slate-900/70 border border-slate-800/80 px-6 py-5">
-              <TripPhotosSection tripId={tripId} user={user} />
+              <TripPhotoSection tripId={tripId} user={user} />
             </section>
           </div>
         </main>

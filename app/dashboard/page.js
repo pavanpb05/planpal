@@ -17,7 +17,6 @@ export default function DashboardPage() {
 
     async function initAuth() {
       try {
-        // dynamic import of your firebase config (client-only)
         const firebaseModule = await import("@/firebase");
         const { auth } = firebaseModule;
         const { onAuthStateChanged } = await import("firebase/auth");
@@ -34,7 +33,6 @@ export default function DashboardPage() {
         });
       } catch (err) {
         console.error("Failed to initialize auth:", err);
-        // fallback: redirect to login to avoid stuck state
         router.push("/login");
       }
     }
@@ -90,15 +88,32 @@ export default function DashboardPage() {
     },
   ];
 
+  // 👇 single source of truth for user name
+const name =
+  user?.displayName || user?.email?.split("@")[0] || "User";
+
+const uiUser = user
+  ? {
+      ...user,
+      displayName: name,
+    }
+  : null;
+
   return (
     <div className="min-h-screen bg-neutral-900 text-slate-100 flex">
       <Sidebar handleLogout={handleLogout} />
-      <div className="flex-1 flex flex-col" style={{ marginLeft: "var(--sidebar-width, 256px)" }}>
-        <Topbar user={user} />
+
+      <div
+        className="flex-1 flex flex-col"
+        style={{ marginLeft: "var(--sidebar-width, 256px)" }}
+      >
+        <Topbar user={uiUser} />
 
         <main className="p-6">
           <section className="mb-6">
-            <h2 className="text-3xl font-semibold">Welcome back, {user?.displayName || user?.email?.split("@")[0]}!</h2>
+            <h2 className="text-3xl font-semibold">
+              Welcome back {uiUser}!
+            </h2>
             <p className="text-lg text-slate-400 mt-2 max-w-2xl">
               Plan and manage group trips, vote on options, split expenses & view smart suggestions.
             </p>
