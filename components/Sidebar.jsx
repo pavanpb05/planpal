@@ -3,7 +3,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, LogOut } from "lucide-react";
+import { Home, User, LogOut, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -12,30 +13,69 @@ const navItems = [
 
 export default function Sidebar({ handleLogout }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved =
+      typeof window !== "undefined" &&
+      localStorage.getItem("sidebar-collapsed");
+    return saved !== null ? saved === "true" : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", collapsed ? "true" : "false");
+    document.documentElement.style.setProperty(
+      "--sidebar-width",
+      collapsed ? "72px" : "256px"
+    );
+  }, [collapsed]);
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 w-20 lg:w-64 border-r border-slate-800/80 bg-linear-to-b from-slate-950 via-slate-950 to-slate-900 shadow-[0_18px_70px_rgba(15,23,42,0.95)]">
-      <div className="flex h-full flex-col px-3 py-6">
-        {/* Logo */}
-        <div className="mb-10 flex items-center justify-center lg:justify-start lg:px-2">
-          <div className="inline-flex items-center gap-2">
-            <div className="h-8 w-8 rounded-2xl bg-linear-to-br from-indigo-500 via-sky-400 to-emerald-400 shadow-lg shadow-indigo-900/80" />
-            <span className="hidden lg:inline text-sm font-semibold tracking-[0.25em] text-slate-100 uppercase">
-              PlanPal
-            </span>
+    <aside
+      className={`fixed inset-y-0 left-0 z-30 flex flex-col
+      bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900
+      shadow-[0_18px_70px_rgba(15,23,42,0.95)]
+      border-r border-slate-800/80 transition-all duration-300`}
+      style={{ width: collapsed ? 72 : 256 }}
+    >
+      <div className="flex h-full flex-col px-3 py-5">
+        <div className="flex items-center justify-between mb-6 px-2">
+          {/* LOGO */}
+          <div className="flex items-center gap-3">
+            <div
+              className={`h-8 w-8 rounded-2xl shadow-lg ${
+                collapsed
+                  ? "bg-indigo-500"
+                  : "bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400"
+              }`}
+            />
+
+            {!collapsed && (
+              <span className="text-sm font-semibold tracking-[0.25em] text-slate-100 uppercase">
+                PlanPal
+              </span>
+            )}
           </div>
+
+          {/* COLLAPSE BUTTON */}
+          <button
+            aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
+            onClick={() => setCollapsed((s) => !s)}
+            className="p-1 rounded-md hover:bg-slate-900/50 transition"
+            title={collapsed ? "Open" : "Collapse"}
+          >
+            <Menu className="h-5 w-5 text-slate-200" />
+          </button>
         </div>
 
-        {/* Nav links */}
+        {/* NAVIGATION */}
         <nav className="flex-1 space-y-2">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
-              <Link key={href} href={href}>
+              <Link key={href} href={href} className="block">
                 <div
-                  className={`group flex items-center gap-3 rounded-2xl px-2 py-2.5 text-sm font-medium transition-all duration-300 cursor-pointer ${
+                  className={`group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-300 cursor-pointer ${
                     active
-                      ? "bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-400 text-slate-950 shadow-lg shadow-indigo-900/70"
+                      ? "bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 text-slate-950 shadow-lg"
                       : "text-slate-300 hover:text-slate-50 hover:bg-slate-900/70"
                   }`}
                 >
@@ -44,23 +84,23 @@ export default function Sidebar({ handleLogout }) {
                       active ? "scale-110" : "group-hover:scale-110"
                     }`}
                   />
-                  <span className="hidden lg:inline truncate">{label}</span>
+                  {!collapsed && <span className="truncate">{label}</span>}
                 </div>
               </Link>
             );
           })}
         </nav>
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="mt-6 flex items-center justify-center lg:justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-900/80 px-2 py-2.5 text-xs font-semibold text-red-300 shadow-[0_10px_30px_rgba(15,23,42,0.9)] transition-all duration-300 hover:border-red-500/80 hover:bg-red-500/10 hover:text-red-200"
-        >
-          <div className="flex items-center gap-2">
+        {/* LOGOUT */}
+        <div className="mt-auto">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-xs font-semibold text-red-300 transition-all duration-300 hover:bg-red-600/10 hover:text-red-200"
+          >
             <LogOut className="h-4 w-4" />
-            <span className="hidden lg:inline">Log out</span>
-          </div>
-        </button>
+            <span className="hidden md:inline">Log out</span>
+          </button>
+        </div>
       </div>
     </aside>
   );
