@@ -3,11 +3,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/src/firebaseAuth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/firebase"; // canonical path
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
-import TripPhotosSection from "@/components/TripPhotosSection";
+import TripPhotoSection from "@/components/TripPhotosSection";
 
 export default function TripPage() {
   const params = useParams();
@@ -16,6 +16,11 @@ export default function TripPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    if (!auth) {
+      console.error("Auth not initialized");
+      router.push("/login");
+      return;
+    }
     const unsub = onAuthStateChanged(auth, (u) => {
       if (!u) {
         router.push("/login");
@@ -36,7 +41,7 @@ export default function TripPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex">
-      <Sidebar handleLogout={async () => { await auth.signOut(); router.push("/login"); }} />
+      <Sidebar handleLogout={async () => { await signOut(auth); router.push("/login"); }} />
 
       <div
         className="flex-1 flex flex-col"
@@ -58,7 +63,7 @@ export default function TripPage() {
 
             {/* Photos */}
             <section className="rounded-3xl bg-slate-900/70 border border-slate-800/80 px-6 py-5">
-              <TripPhotosSection tripId={tripId} user={user} />
+              <TripPhotoSection tripId={tripId} user={user} />
             </section>
           </div>
         </main>
