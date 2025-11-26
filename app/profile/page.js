@@ -22,6 +22,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import { uploadImageToCloudinary } from "@/src/lib/uploadImage";
 
 function ProfileField({ icon: Icon, label, value, multiline = false }) {
   return (
@@ -158,37 +159,50 @@ export default function ProfilePage() {
     try {
       let avatarUrl = form.avatarUrl || "";
 
-      // If user selected a new avatar, upload to Firebase Storage
-      // if (avatarFile) {
-      //   const storageRef = ref(storage, `avatars/${user.uid}`);
-      //   await uploadBytes(storageRef, avatarFile);
-      //   avatarUrl = await getDownloadURL(storageRef);
-      // }
+      if (avatarFile) {
+      avatarUrl = await uploadImageToCloudinary(
+        avatarFile,
+        `planpal/avatars/${user.uid}`
+      );
+    }
 
-      const payload = {
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        age: form.age.trim(),
-        location: form.location.trim(),
-        interests: form.interests.trim(),
-        bio: form.bio.trim(),
-        email: user.email,
-        avatarUrl,
-        updatedAt: new Date().toISOString(),
-      };
-
+       const payload = {
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      age: form.age.trim(),
+      location: form.location.trim(),
+      interests: form.interests.trim(),
+      bio: form.bio.trim(),
+      email: user.email,
+      avatarUrl,
+      updatedAt: new Date().toISOString(),
+    };
       await setDoc(doc(db, "users", user.uid), payload, { merge: true });
 
-      setProfile((prev) => ({ ...(prev || {}), ...payload }));
-      setForm((prev) => ({ ...prev, avatarUrl }));
-      setIsEditing(false);
-    } catch (err) {
-      console.error(err);
-      setFormError("Could not save changes. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  };
+    setProfile((prev) => ({ ...(prev || {}), ...payload }));
+    setForm((prev) => ({ ...prev, avatarUrl }));
+    setAvatarFile(null);
+    setIsEditing(false);
+  } catch (err) {
+    console.error(err);
+    setFormError("Could not save changes. Please try again.");
+  } finally {
+    setSaving(false);
+  }
+};
+
+const effectiveAvatar =
+  (profile && profile.avatarUrl) ||
+  (user && user.photoURL) ||
+  "";
+
+  const uiUser = user
+    ? {
+        ...user,
+        photoURL: effectiveAvatar,
+      }
+    : null;
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex">
@@ -198,7 +212,7 @@ export default function ProfilePage() {
         className="flex-1 flex flex-col"
         style={{ marginLeft: "var(--sidebar-width, 256px)" }}
       >
-        <Topbar user={user} />
+        <Topbar user={uiUser} />
 
         <main className="px-4 py-8 lg:px-12 lg:py-10">
           <div className="max-w-7xl mx-auto rounded-3xl bg-slate-900/60 border border-slate-800/80 shadow-[0_18px_60px_rgba(15,23,42,0.9)] backdrop-blur-xl px-6 py-6 lg:px-10 lg:py-10 space-y-8">
@@ -226,7 +240,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 {/* Left profile card (existing component) */}
                 <section>
-                  <ProfileCard user={user} profile={profile} />
+                  <ProfileCard user={uiUser} profile={profile} />
                 </section>
 
                 {/* Right side – details + edit */}
